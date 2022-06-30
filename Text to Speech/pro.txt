@@ -1,0 +1,52 @@
+from tkinter import *
+from tkinter import filedialog
+import pyttsx3  #a text-to-speech conversion library in Python which works offline 
+import PyPDF2   #PDF library capable of splitting, merging together, 
+                #cropping, and transforming the pages of PDF files.
+import tkinter as tk
+
+#Create an instance of tkinter frame or window
+root = Tk()
+#Giving title to the window
+root.title("TEXT TO SPEECH CONVERSION")
+root.geometry('350x350')
+
+#Crearing a label
+label_page = Label(root, text="Starting Page Number").pack()
+start_page_number = Entry(root)
+start_page_number.pack()
+
+label_page = Label(root, text="Ending Page Number").pack()
+end_page_number = Entry(root)
+end_page_number.pack()
+
+label = Label(root, text="Which PDF Document do you want to read?").pack()
+
+def fileDialog():
+    path = filedialog.askopenfilename()     #opens dialog box to choose file
+    book = open(path, 'rb')                 #opens PDF
+    pdfReader = PyPDF2.PdfFileReader(book)  #reads the pdf file
+    pages = pdfReader.numPages              #retrieve no. of pages in pdf
+    speaker = pyttsx3.init()                # init function to get an engine instance for the speech synthesis
+    
+    for num in range(int(start_page_number.get()), int(end_page_number.get())):
+        page = pdfReader.getPage(num)       #retrieve a page by no.
+        txt = page.extractText()            #extract text from the page
+        speaker.say(txt)                    # say method on the engine that passing input text to be spoken
+        speaker.runAndWait()                # run and wait method, it processes the voice commands.
+
+Button(root, text="Choose PDF", command=fileDialog).pack()
+
+label_page = Label(root, text="OR\nEnter Text Manually").pack()
+inputtxt = tk.Text(root,height = 5,width = 20)
+inputtxt.pack()
+
+def manual_text():
+    answer = inputtxt.get(1.0, "end-1c")    #"1.0" is starting pt & "end-1c" means the position is one character ahead of "end"
+    text_speech = pyttsx3.init()        # init function to get an engine instance for the speech synthesis
+    text_speech.say(answer)             # say method on the engine that passing input text to be spoken
+    text_speech.runAndWait()            # run and wait method, it processes the voice commands.
+
+Button(root, text="Listen", command=manual_text).pack()
+
+root.mainloop() # run our applications
